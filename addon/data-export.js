@@ -27,7 +27,8 @@ class QueryHistory {
 
   add(entry) {
     let history = this._get();
-    let historyIndex = history.findIndex(e => e.query == entry.query && e.useToolingApi == entry.useToolingApi);
+    //https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/219/files
+    let historyIndex = history.findIndex(e => (e.query == entry.query && e.useToolingApi == entry.useToolingApi) || (e.title== entry.title && entry.title));
     if (historyIndex > -1) {
       history.splice(historyIndex, 1);
     }
@@ -79,9 +80,9 @@ class Model {
     this.exportStatus = "Ready";
     this.exportError = null;
     this.exportedData = null;
-    this.queryHistory = new QueryHistory("insextQueryHistory", 100);
+    this.queryHistory = new QueryHistory("insextQueryHistory", 150);
     this.selectedHistoryEntry = null;
-    this.savedHistory = new QueryHistory("insextSavedQueryHistory", 50);
+    this.savedHistory = new QueryHistory("insextSavedQueryHistory", 100);
     this.selectedSavedEntry = null;
     this.expandAutocomplete = false;
     this.expandSavedOptions = false;
@@ -164,7 +165,8 @@ class Model {
     this.savedHistory.clear();
   }
   addToHistory() {
-    this.savedHistory.add({query: this.queryInput.value, useToolingApi: this.queryTooling});
+    //https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/219/files
+    this.savedHistory.add({query: this.queryInput.value, useToolingApi: this.queryTooling, title: prompt('Title for your query (let empty too use the query as title)?','')});
   }
   removeFromHistory() {
     this.savedHistory.remove({query: this.queryInput.value, useToolingApi: this.queryTooling});
@@ -1097,7 +1099,8 @@ class App extends React.Component {
             h("div", {className: "button-group"},
               h("select", {value: JSON.stringify(model.selectedSavedEntry), onChange: this.onSelectSavedEntry, className: "query-history"},
                 h("option", {value: JSON.stringify(null) , disabled: true}, "Saved Queries"),
-                model.savedHistory.list.map(q => h("option", {key: JSON.stringify(q), value: JSON.stringify(q)}, q.query.substring(0, 300)))
+                //https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/219/files
+                model.savedHistory.list.map(q => h("option", {key: JSON.stringify(q), value: JSON.stringify(q)}, q.title?q.title:q.query.substring(0, 300)))
               ),
               h("button", {onClick: this.onAddToHistory, title: "Add query to saved history"}, "Save Query"),
               h("button", {className: model.expandSavedOptions ? "toggle contract" : "toggle expand", title: "Show More Options", onClick: this.onToggleSavedOptions}, h("div", {className: "button-toggle-icon"})),
