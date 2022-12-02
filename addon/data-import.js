@@ -136,6 +136,15 @@ class Model {
     importOptions.set("threads", this.batchConcurrency);
     copyToClipboard(importOptions.toString());
   }
+  //https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/234/files
+  skipAllUnknownFields() {
+    for (let column of this.importData.importTable.header) {
+      if (column.columnUnknownField()) {
+        column.columnSkip();
+      }
+    }
+    this.didUpdate();
+  }
 
   invalidInput() {
     // We should try to allow imports to succeed even if our validation logic does not exactly match the one in Salesforce.
@@ -270,6 +279,17 @@ class Model {
 
   canCopy() {
     return this.importData.taggedRows != null;
+  }
+  //https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/234/files
+  canSkipAllUnknownFields() {
+    if (this.importData.importTable && this.importData.importTable.header) {
+      for (let column of this.importData.importTable.header) {
+        if (!column.columnIgnore() && column.columnUnknownField()) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   copyResult(separator) {
@@ -474,6 +494,10 @@ class Model {
           return "Error: Unknown field";
         }
         return "";
+      //https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/234/files
+      },
+      columnUnknownField() {
+        return columnVm.columnError() === "Error: Unknown field";
       }
     };
     return columnVm;
@@ -659,6 +683,7 @@ class App extends React.Component {
     this.onCopyAsExcelClick = this.onCopyAsExcelClick.bind(this);
     this.onCopyAsCsvClick = this.onCopyAsCsvClick.bind(this);
     this.onCopyOptionsClick = this.onCopyOptionsClick.bind(this);
+    this.onSkipAllUnknownFieldsClick = this.onSkipAllUnknownFieldsClick.bind(this);
     this.onConfirmPopupYesClick = this.onConfirmPopupYesClick.bind(this);
     this.onConfirmPopupNoClick = this.onConfirmPopupNoClick.bind(this);
     this.unloadListener = null;
@@ -749,6 +774,12 @@ class App extends React.Component {
     e.preventDefault();
     let {model} = this.props;
     model.copyOptions();
+  }
+  //https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/234/files
+  onSkipAllUnknownFieldsClick(e) {
+    e.preventDefault();
+    let {model} = this.props;
+    model.skipAllUnknownFields();
   }
   onConfirmPopupYesClick(e) {
     e.preventDefault();
@@ -922,6 +953,7 @@ class App extends React.Component {
             h("div", {className: "button-group"},
               h("button", {disabled: !model.canCopy(), onClick: this.onCopyAsExcelClick, title: "Copy import result to clipboard for pasting into Excel or similar"}, "Copy (Excel format)"),
               h("button", {disabled: !model.canCopy(), onClick: this.onCopyAsCsvClick, title: "Copy import result to clipboard for saving as a CSV file"}, "Copy (CSV)"),
+              h("button", {disabled: !model.canSkipAllUnknownFields() || model.isWorking() || model.importCounts().Queued == 0, onClick: this.onSkipAllUnknownFieldsClick}, "Skip all unknown fields")
             ),
           ),
           h("div", {className: "status-group"},
