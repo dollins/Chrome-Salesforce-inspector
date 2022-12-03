@@ -22,14 +22,15 @@ function init({sfHost, inDevConsole, inLightning, inInspector}) {
   let addonVersion = chrome.runtime.getManifest().version;
 
   sfConn.getSession(sfHost).then(() => {
+    const root = ReactDOM.createRoot(document.getElementById("root"));
 
-    ReactDOM.render(h(App, {
+    root.render(h(App, {
       sfHost,
       inDevConsole,
       inLightning,
       inInspector,
       addonVersion,
-    }), document.getElementById("root"));
+    }));
 
   });
 }

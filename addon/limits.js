@@ -176,17 +176,17 @@ class App extends React.Component {
   initButton(sfHost, true);
   sfConn.getSession(sfHost).then(() => {
 
-    let root = document.getElementById("root");
+    let root = ReactDOM.createRoot(document.getElementById("root"));
     let vm = new Model(sfHost);
     vm.startLoading(args);
     vm.reactCallback = cb => {
-      ReactDOM.render(h(App, {
+      root.render(h(App, {
         vm
-      }), root, cb);
+      }));
     };
-    ReactDOM.render(h(App, {
+    root.render(h(App, {
       vm
-    }), root);
+    }));
 
   });
 

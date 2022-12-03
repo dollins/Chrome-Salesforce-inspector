@@ -326,13 +326,13 @@ class ObjectSelector extends React.Component {
   initButton(sfHost, true);
   sfConn.getSession(sfHost).then(() => {
 
-    let root = document.getElementById("root");
+    let root = ReactDOM.createRoot(document.getElementById("root"));
     let model = new Model(sfHost);
     model.startLoading();
     model.reactCallback = cb => {
-      ReactDOM.render(h(App, {model}), root, cb);
+      root.render(h(App, {model}));
     };
-    ReactDOM.render(h(App, {model}), root);
+    root.render(h(App, {model}));
 
   });
 

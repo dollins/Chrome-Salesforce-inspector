@@ -7,6 +7,7 @@ General
 * Enhanced Domain Resolved https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/223
 * Name the Saved Query Export https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/219
 * Skip All Unknown Fields For Import https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/234
+* Update REACT v 18.2.0, all errors fixed
 
 Version 1.13
 ===========
