@@ -12,6 +12,7 @@
     "https://*.force.com/*",
     "https://*.cloudforce.com/*",
     "https://*.visualforce.com/*",
+    "https://*.lightning.force.com/*",
     "https://*.salesforce.mil/*",
     "https://*.visual.force.mil/*",
     "https://*.lightning.force.mil/*",
@@ -70,6 +71,6 @@
       ]
     }
   ],
-  "incognito": "replaced-at-build",
+  "incognito": "split",
   "manifest_version": 3
 }
