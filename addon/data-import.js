@@ -82,14 +82,26 @@ class Model {
   }
 
   message() {
-    return this.dataFormat == "excel" ? "Paste Excel data here" : "Paste CSV data here";
+    return "Paste Excel or CSV data here";
   }
 
   setData(text) {
     if (this.isWorking()) {
       return;
     }
-    let separator = this.dataFormat == "excel" ? "\t" : ",";
+    let separator = "\t";
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === "\t") {
+        this.dataFormat == "excel";
+        separator = "\t"
+        break;
+      } else if (text[i] === "," || i === 131075) {
+        this.dataFormat == "csv";
+        separator = ","
+        break;
+      }
+    }
+    console.log(this.dataFormat);
     let data;
     try {
       data = csvParse(text, separator);
@@ -123,6 +135,66 @@ class Model {
     let header = data.shift().map((c, index) => this.makeColumn(c, index));
     this.updateResult(null); // Two updates, the first clears state from the scrolltable
     this.updateResult({header, data});
+    this.setSObjectAndAction(header, data);
+  }
+
+  setSObjectAndAction(header, data) {
+    // Check if the header contains Id, and set importAction
+    let indexOfId = header.findIndex(col => col.columnValue === "Id");
+    let regex = /\[(.*?)\]/; // This matches any string that starts with '[' and ends with ']'
+    // Check if there is sObject name in any of the column copied from export or manually added
+    let foundSObjectName = data[0].filter(columnValue => regex.test(columnValue));
+
+    // If there is Id expect Update Action
+    if (indexOfId !== -1) {
+      this.importAction = "update";
+    }
+
+
+    //Check for sObject in query and set Tooling API if it is tooling api sobject
+    if (foundSObjectName.length > 0) {
+      console.log("Found Name: ", foundSObjectName[0].replace(/[\[\]]/g, ""));
+      let sObjectName = foundSObjectName[0].replace(/[\[\]]/g, "");
+      this.importType = sObjectName;
+      sfConn.rest("/services/data/v" + apiVersion + "/tooling/sobjects/").then((sObjectsListTemp) => {
+        sObjectsListTemp.sobjects.find(sObject => {
+          if (sObject.name === sObjectName) {
+            this.useToolingApi = true;
+            this.didUpdate();
+            return;
+          }
+        });
+      });
+      return;
+    } else if (indexOfId !== -1) { // Check with the Id from object description on demand, try both API
+      sfConn.rest("/services/data/v" + apiVersion + "/sobjects/").then((sObjectsListTemp) => {
+        let prefixString = data[0][indexOfId].substr(0, 3).replaceAll(" ", "");
+        sObjectsListTemp.sobjects.find(sObject => {
+          if (sObject.keyPrefix) {
+            if (sObject.keyPrefix.startsWith(prefixString)) {
+              this.importType = sObject.name;
+              this.useToolingApi = false;
+              this.didUpdate();
+              return;
+            }
+          }
+        });
+      }).then(() => {
+        sfConn.rest("/services/data/v" + apiVersion + "/tooling/sobjects/").then((sObjectsListTemp) => {
+          let prefixString = data[0][indexOfId].substr(0, 3).replaceAll(" ", "");
+          sObjectsListTemp.sobjects.find(sObject => {
+            if (sObject.keyPrefix) {
+              if (sObject.keyPrefix.startsWith(prefixString)) {
+                this.importType = sObject.name;
+                this.useToolingApi = true;
+                this.didUpdate();
+                return;
+              }
+            }
+          });
+        });
+      });
+    }
   }
 
   copyOptions() {
@@ -671,7 +743,6 @@ class App extends React.Component {
     this.onUseToolingApiChange = this.onUseToolingApiChange.bind(this);
     this.onImportActionChange = this.onImportActionChange.bind(this);
     this.onImportTypeChange = this.onImportTypeChange.bind(this);
-    this.onDataFormatChange = this.onDataFormatChange.bind(this);
     this.onDataPaste = this.onDataPaste.bind(this);
     this.onExternalIdChange = this.onExternalIdChange.bind(this);
     this.onBatchSizeChange = this.onBatchSizeChange.bind(this);
@@ -703,11 +774,6 @@ class App extends React.Component {
   onImportTypeChange(e) {
     let {model} = this.props;
     model.importType = e.target.value;
-    model.didUpdate();
-  }
-  onDataFormatChange(e) {
-    let {model} = this.props;
-    model.dataFormat = e.target.value;
     model.didUpdate();
   }
   onDataPaste(e) {
@@ -884,12 +950,6 @@ class App extends React.Component {
               h("a", {className: "button field-info", href: model.showDescribeUrl(), target: "_blank", title: "Show field info for the selected object"}, 
                 h("div", {className: "button-icon"}),
               )
-            ),
-            h("div", {className: "conf-line radio-buttons"},
-              h("span", {className: "conf-label"}, "Format"),
-              h("label", {}, h("input", {type: "radio", name: "data-input-format", value: "excel", checked: model.dataFormat == "excel", onChange: this.onDataFormatChange, disabled: model.isWorking()}), " ", h("span", {}, "Excel")),
-              " ",
-              h("label", {}, h("input", {type: "radio", name: "data-input-format", value: "csv", checked: model.dataFormat == "csv", onChange: this.onDataFormatChange, disabled: model.isWorking()}), " ", h("span", {}, "CSV"))
             ),
             h("div", {className: "conf-line"},
               h("label", {className: "conf-input"},

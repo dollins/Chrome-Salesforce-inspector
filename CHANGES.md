@@ -5,6 +5,14 @@ General
 -------
 * Update to Salesforce API v 57.0
 
+Import Data
+-------
+* Automatical recognize Excel or CSV file, just click and paste data.
+* When importing data with Id, operation is changed to update.
+* If there is \[sObjectName\] in any column or valid Salesforce Id, the object for import is choosen automatically.
+* If the object is part of Tooling API, it is automatically set to Tooling API.
+
+
 Version 1.14
 ===========
 
