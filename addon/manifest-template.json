@@ -1,7 +1,7 @@
 {
   "name": "Salesforce inspector",
   "description": "Productivity tools for Salesforce administrators and developers to inspect data and metadata directly from the Salesforce UI.",
-  "version": "1.13",
+  "version": "1.14",
   "icons": {
     "128": "icon128.png"
   },
@@ -12,11 +12,13 @@
     }
   },
   "minimum_chrome_version": "61",
-  "permissions": [
+  "permissions": ["cookies"],
+  "host_permissions": [
     "https://*.salesforce.com/*",
     "https://*.force.com/*",
     "https://*.cloudforce.com/*",
     "https://*.visualforce.com/*",
+    "https://*.lightning.force.com/*",
     "https://*.salesforce.mil/*",
     "https://*.visual.force.mil/*",
     "https://*.lightning.force.mil/*",
@@ -30,7 +32,6 @@
       "matches": [
         "https://*.salesforce.com/*",
         "https://*.visual.force.com/*",
-        "https://*.vf.force.com/*",
         "https://*.lightning.force.com/*",
         "https://*.cloudforce.com/*",
         "https://*.visualforce.com/*",
@@ -42,30 +43,40 @@
         "https://*.visualforce.mil/*"
       ],
       "all_frames": true,
-      "css": [
-        "button.css",
-        "inspect-inline.css"
-      ],
-      "js": [
-        "button.js",
-        "inspect-inline.js"
-      ]
+      "css": ["button.css", "inspect-inline.css"],
+      "js": ["button.js", "inspect-inline.js"]
     }
   ],
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "service_worker": "background.js"
   },
   "web_accessible_resources": [
-    "popup.html",
-    "data-export.html",
-    "data-import.html",
-    "inspect.html",
-    "metadata-retrieve.html",
-    "explore-api.html",
-    "limits.html"
+    {
+      "extension_ids": [],
+      "matches": [
+        "https://*.salesforce.com/*",
+        "https://*.visual.force.com/*",
+        "https://*.lightning.force.com/*",
+        "https://*.cloudforce.com/*",
+        "https://*.visualforce.com/*",
+        "https://*.salesforce.mil/*",
+        "https://*.visual.force.mil/*",
+        "https://*.lightning.force.mil/*",
+        "https://*.lightning.crmforce.mil/*",
+        "https://*.cloudforce.mil/*",
+        "https://*.visualforce.mil/*"
+      ],
+      "resources": [
+        "popup.html",
+        "data-export.html",
+        "data-import.html",
+        "inspect.html",
+        "metadata-retrieve.html",
+        "explore-api.html",
+        "limits.html"
+      ]
+    }
   ],
   "incognito": "replaced-at-build",
-  "manifest_version": 2
+  "manifest_version": 3
 }
