@@ -3,6 +3,13 @@ Version 1.14
 
 General
 -------
+* Update to Salesforce API v 57.0
+
+Version 1.14
+===========
+
+General
+-------
 * Update to Salesforce API v 56.0
 * Enhanced Domain Resolved https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/223
 * Name the Saved Query Export https://github.com/sorenkrabbe/Chrome-Salesforce-inspector/pull/219
