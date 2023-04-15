@@ -35,6 +35,9 @@ class Model {
       Failed: true
     };
 
+    this.sObjectDescribtion = undefined;
+    this.referenceSobjectDescribtion = undefined;
+
     this.importTableResult = null;
     this.updateResult(null);
 
@@ -101,7 +104,6 @@ class Model {
         break;
       }
     }
-    console.log(this.dataFormat);
     let data;
     try {
       data = csvParse(text, separator);
@@ -141,7 +143,7 @@ class Model {
   setSObjectAndAction(header, data) {
     // Check if the header contains Id, and set importAction
     let indexOfId = header.findIndex(col => col.columnValue === "Id");
-    let regex = /\[(.*?)\]/; // This matches any string that starts with '[' and ends with ']'
+    let regex = /\[([^{}]*?)\]/; // This matches any string that starts with '[' and ends with ']'
     // Check if there is sObject name in any of the column copied from export or manually added
     let foundSObjectName = data[0].filter(columnValue => regex.test(columnValue));
 
@@ -150,10 +152,8 @@ class Model {
       this.importAction = "update";
     }
 
-
     //Check for sObject in query and set Tooling API if it is tooling api sobject
     if (foundSObjectName.length > 0) {
-      console.log("Found Name: ", foundSObjectName[0].replace(/[\[\]]/g, ""));
       let sObjectName = foundSObjectName[0].replace(/[\[\]]/g, "");
       this.importType = sObjectName;
       sfConn.rest("/services/data/v" + apiVersion + "/tooling/sobjects/").then((sObjectsListTemp) => {
@@ -273,7 +273,7 @@ class Model {
                 let referenceSobjectDescribe = self.describeInfo.describeSobject(useToolingApi, referenceSobjectName).sobjectDescribe;
                 if (referenceSobjectDescribe) {
                   for (let referenceField of referenceSobjectDescribe.fields) {
-                    if (referenceField.idLookup) {
+                    if (field.updateable) {
                       yield field.relationshipName + ":" + referenceSobjectDescribe.name + ":" + referenceField.name;
                     }
                   }
@@ -539,6 +539,9 @@ class Model {
         columnVm.columnValue = "_" + columnVm.columnValue;
       },
       columnValid() {
+        if (columnVm.columnOriginalValue.includes(".") && columnVm.columnValue.includes(".")) {
+          columnVm.columnValue = columnVm.columnOriginalValue.replaceAll(".", ":");
+        }
         let columnName = columnVm.columnValue.split(":");
         // Ensure there are 1 or 3 elements, so we know if we should treat it as a normal field or an external ID
         if (columnName.length != 1 && columnName.length != 3) {
@@ -880,11 +883,11 @@ class App extends React.Component {
           // Ask the user for confirmation before leaving
           e.returnValue = "The import will be stopped";
         };
-        console.log("added listener");
+        //console.log("added listener");
         addEventListener("beforeunload", this.unloadListener);
       }
     } else if (this.unloadListener) {
-      console.log("removed listener");
+      //console.log("removed listener");
       removeEventListener("beforeunload", this.unloadListener);
     }
   }

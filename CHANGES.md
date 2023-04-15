@@ -1,4 +1,4 @@
-Version 1.14
+Version 1.15
 ===========
 
 General
@@ -11,6 +11,8 @@ Import Data
 * When importing data with Id, operation is changed to update.
 * If there is \[sObjectName\] in any column or valid Salesforce Id, the object for import is choosen automatically.
 * If the object is part of Tooling API, it is automatically set to Tooling API.
+* Notation from standard export is automatically transfered to : so the field is just a click to use mapping.
+* Fixed bug, not all of the related fields that are editable were shown.
 
 
 Version 1.14

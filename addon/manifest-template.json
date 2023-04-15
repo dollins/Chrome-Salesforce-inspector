@@ -5,7 +5,7 @@
   "icons": {
     "128": "icon128.png"
   },
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "jid1-DBcuAQpfLMcvOQ@jetpack",
       "strict_min_version": "60.0"
