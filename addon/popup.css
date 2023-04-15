@@ -26,16 +26,26 @@ html, body, #root, [data-reactroot] {
     border-top: 1px solid #d8dde6;
 }
 .header {
-    background: #061c3f;
+    background: #0176d3;
     padding: 8px;
     color: white;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+}
+.header-title {
+    font-size: 15px;
+    font-weight: 800;
+}
+.header-close-button {
+    width: 18px;
+    display: flex;
+}
+.header-close-button img {
+    width: 100%;
 }
 .header-icon {
     margin-right: 12px;
-    background-color: #d8be5f;
-    border-radius: 4px;
 }
 .header-icon>svg {
     line-height: 1;
