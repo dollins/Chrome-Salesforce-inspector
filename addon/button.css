@@ -25,11 +25,11 @@
 }
 #insext .insext-btn {
     box-sizing: border-box;
-    width: 15px;
-    height: 33px;
+    width: 30px;
+    height: 38px;
     padding: 3px 1px 2px 0;
-    background-color: #226b86;
-    border-width: 4px;
+    background-color: #014486;
+    border-width: 1px;
     border-style: solid;
     border-right-style: none;
     border-color: #fff;
@@ -41,7 +41,6 @@
 #insext .insext-btn:hover,
 #insext.insext-active .insext-btn {
     opacity: 1;
-    width: 20px; 
 }
 #insext .insext-btn img {
     box-sizing: border-box;
