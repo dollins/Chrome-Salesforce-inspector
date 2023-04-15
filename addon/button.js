@@ -72,6 +72,7 @@ function initButton(sfHost, inInspector) {
     });
     rootEl.appendChild(popupEl);
     function openPopup() {
+      btn.classList.add('hidden');
       popupEl.contentWindow.postMessage({insextUpdateRecordId: true, locationHref: location.href}, "*");
       rootEl.classList.add("insext-active");
       // These event listeners are only enabled when the popup is active to avoid interfering with Salesforce when not using the inspector
@@ -79,6 +80,7 @@ function initButton(sfHost, inInspector) {
       popupEl.focus();
     }
     function closePopup() {
+      btn.classList.remove('hidden');
       rootEl.classList.remove("insext-active");
       removeEventListener("click", outsidePopupClick);
       popupEl.blur();
@@ -89,6 +91,11 @@ function initButton(sfHost, inInspector) {
         closePopup();
       }
     }
+    window.addEventListener("message", (event) => {
+      if (event.data === "SFInspectorClose") {
+        closePopup();
+      }
+    });
   }
 
 }

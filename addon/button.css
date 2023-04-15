@@ -46,6 +46,9 @@
     opacity: 1;
     width: 28px;
 }
+#insext .insext-btn.hidden {
+    display: none;
+}
 #insext .insext-btn img {
     box-sizing: border-box;
     width: 10px;
